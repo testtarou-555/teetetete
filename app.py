@@ -8,7 +8,7 @@ import pytz
 app = Flask(__name__)
 
 # 環境変数からLINE Notifyのアクセストークンとタイムゾーンを取得
-LINE_NOTIFY_ACCESS_TOKEN = os.getenv('sljv9nkjLgAx7qEYxEGMkb7iAwpwqceBJcTA1f1REwq')
+LINE_NOTIFY_ACCESS_TOKEN = os.getenv('LINE_NOTIFY_ACCESS_TOKEN')
 TIMEZONE = os.getenv('TIMEZONE', 'Asia/Tokyo')  # デフォルトは東京時間
 
 def send_line_notify():
@@ -17,7 +17,7 @@ def send_line_notify():
         "Authorization": f"Bearer {LINE_NOTIFY_ACCESS_TOKEN}"
     }
     data = {
-        "message": "13:00です！"
+        "message": f"{datetime.now().strftime('%H:%M:%S')} - これは5分ごとの通知です！"
     }
     try:
         response = requests.post(url, headers=headers, data=data)
@@ -34,8 +34,8 @@ def home():
 
 def schedule_job():
     scheduler = BackgroundScheduler(timezone=TIMEZONE)
-    # 通知を13:00に設定
-    scheduler.add_job(send_line_notify, 'cron', hour=13, minute=0)
+    # 通知を5分ごとに設定
+    scheduler.add_job(send_line_notify, 'interval', minutes=5)
     scheduler.start()
     print("スケジューラーが開始されました。")
 
