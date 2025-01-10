@@ -7,13 +7,12 @@ import pytz
 
 app = Flask(__name__)
 
-# 環境変数からLINE Notifyのアクセストークンとタイムゾーンを取得
-LINE_NOTIFY_ACCESS_TOKEN = 'TVb5EFJlsvu12xS78vkLwYbqCPjYrCYhtLKeQGwfAWt'
-TIMEZONE = os.getenv('TIMEZONE', 'Asia/Tokyo')  # デフォルトは東京時間
+LINE_NOTIFY_ACCESS_TOKEN = os.getenv('LINE_NOTIFY_ACCESS_TOKEN')
+TIMEZONE = os.getenv('TIMEZONE', 'Asia/Tokyo')
 
 def send_line_notify():
     message = f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - 3分ごとの通知です。"
-    print(message)  # コンソールにプリント
+    print(message, flush=True)  # Render のログに即時出力
     url = "https://notify-api.line.me/api/notify"
     headers = {
         "Authorization": f"Bearer {LINE_NOTIFY_ACCESS_TOKEN}"
@@ -24,11 +23,11 @@ def send_line_notify():
     try:
         response = requests.post(url, headers=headers, data=data)
         response.raise_for_status()
-        print("LINE Notify にメッセージを送信しました。")
+        print("LINE Notify にメッセージを送信しました。", flush=True)
     except requests.exceptions.HTTPError as err:
-        print(f"HTTPエラー: {err}")
+        print(f"HTTPエラー: {err}", flush=True)
     except Exception as err:
-        print(f"エラー: {err}")
+        print(f"エラー: {err}", flush=True)
 
 @app.route('/')
 def home():
@@ -36,12 +35,10 @@ def home():
 
 def schedule_job():
     scheduler = BackgroundScheduler(timezone=TIMEZONE)
-    # 3分ごとにジョブを実行
     scheduler.add_job(send_line_notify, 'interval', minutes=3)
     scheduler.start()
-    print("スケジューラーが開始されました。（3分ごとの通知）")
+    print("スケジューラーが開始されました。（3分ごとの通知）", flush=True)
 
 if __name__ == "__main__":
     schedule_job()
-    # Flaskアプリを起動
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
