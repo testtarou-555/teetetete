@@ -4,21 +4,23 @@ from flask import Flask
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
-from dotenv import load_dotenv
 
-load_dotenv()
 app = Flask(__name__)
 
-# 環境変数からWebhook URLとタイムゾーンを取得
-WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
+# 環境変数からLINE Notifyのアクセストークンとタイムゾーンを取得
+LINE_NOTIFY_ACCESS_TOKEN = os.getenv('LINE_NOTIFY_ACCESS_TOKEN')
 TIMEZONE = os.getenv('TIMEZONE', 'Asia/Tokyo')  # デフォルトは東京時間
 
-def send_discord_message():
+def send_line_notify():
+    url = "https://notify-api.line.me/api/notify"
+    headers = {
+        "Authorization": f"Bearer {LINE_NOTIFY_ACCESS_TOKEN}"
+    }
     data = {
-        "content": "これは9:40に送信されたメッセージです。"
+        "message": "これは12:45に送信されたメッセージです。"
     }
     try:
-        response = requests.post(WEBHOOK_URL, json=data)
+        response = requests.post(url, headers=headers, data=data)
         response.raise_for_status()
         print(f"{datetime.now()} - メッセージを送信しました。")
     except requests.exceptions.HTTPError as err:
@@ -32,11 +34,12 @@ def home():
 
 def schedule_job():
     scheduler = BackgroundScheduler(timezone=TIMEZONE)
-    scheduler.add_job(send_discord_message, 'cron', hour=9, minute=40)
+    # 通知を12:45に設定
+    scheduler.add_job(send_line_notify, 'cron', hour=12, minute=45)
     scheduler.start()
     print("スケジューラーが開始されました。")
 
 if __name__ == "__main__":
     schedule_job()
     # Flaskアプリを起動
-    app.run()
+    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
