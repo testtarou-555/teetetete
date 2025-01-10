@@ -32,4 +32,16 @@ def send_line_notify():
 
 @app.route('/')
 def home():
-    return "このページはUptimeRobotによって定期的にアクセスされ、RenderのWebサービスをスリープさせないため
+    return "このページはUptimeRobotによって定期的にアクセスされ、RenderのWebサービスをスリープさせないために存在します。"
+
+def schedule_job():
+    scheduler = BackgroundScheduler(timezone=TIMEZONE)
+    # 3分ごとにジョブを実行
+    scheduler.add_job(send_line_notify, 'interval', minutes=3)
+    scheduler.start()
+    print("スケジューラーが開始されました。（3分ごとの通知）")
+
+if __name__ == "__main__":
+    schedule_job()
+    # Flaskアプリを起動
+    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
