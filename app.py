@@ -8,7 +8,7 @@ import pytz
 app = Flask(__name__)
 
 # 環境変数からLINE Notifyのアクセストークンとタイムゾーンを取得
-LINE_NOTIFY_ACCESS_TOKEN = os.getenv('LINE_NOTIFY_ACCESS_TOKEN')
+LINE_NOTIFY_ACCESS_TOKEN = os.getenv('sljv9nkjLgAx7qEYxEGMkb7iAwpwqceBJcTA1f1REwq')
 TIMEZONE = os.getenv('TIMEZONE', 'Asia/Tokyo')  # デフォルトは東京時間
 
 def send_line_notify():
