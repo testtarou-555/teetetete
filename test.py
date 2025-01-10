@@ -17,7 +17,7 @@ def send_line_notify():
         "Authorization": f"Bearer {LINE_NOTIFY_ACCESS_TOKEN}"
     }
     data = {
-        "message": "これは12:45に送信されたメッセージです。"
+        "message": "昼の12:50分です。"
     }
     try:
         response = requests.post(url, headers=headers, data=data)
@@ -34,8 +34,8 @@ def home():
 
 def schedule_job():
     scheduler = BackgroundScheduler(timezone=TIMEZONE)
-    # 通知を12:45に設定
-    scheduler.add_job(send_line_notify, 'cron', hour=12, minute=45)
+    # 通知を昼の12:50に設定
+    scheduler.add_job(send_line_notify, 'cron', hour=12, minute=50)
     scheduler.start()
     print("スケジューラーが開始されました。")
 
